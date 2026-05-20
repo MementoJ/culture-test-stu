@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>汕头文化现代化倾向测试</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #faf3e8 0%, #f5e6d3 100%);
+            min-height: 100vh; color: #4a3728; padding: 16px;
+        }
+        .container { max-width: 600px; margin: 0 auto; padding-bottom: 40px; }
+        .header { text-align: center; padding: 24px 0 12px; }
+        .header h1 { font-size: 26px; color: #c45c26; margin-bottom: 6px; font-weight: 700; }
+        .header .subtitle { font-size: 13px; color: #8b6f47; line-height: 1.5; }
+        .progress-section {
+            background: #fff; border-radius: 16px; padding: 14px 20px;
+            margin-bottom: 12px; box-shadow: 0 2px 12px rgba(196,92,38,0.08);
+        }
+        .progress-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 13px; color: #8b6f47; }
+        .progress-bar-bg { width: 100%; height: 8px; background: #f0e0d0; border-radius: 4px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #e07b39, #c45c26); border-radius: 4px; transition: width 0.4s ease; }
+        .profile-section {
+            background: #fff; border-radius: 16px; padding: 14px 20px;
+            margin-bottom: 12px; box-shadow: 0 2px 12px rgba(196,92,38,0.08);
+        }
+        .profile-title { font-size: 14px; font-weight: 600; color: #c45c26; margin-bottom: 10px; }
+        .profile-row { display: flex; gap: 12px; flex-wrap: wrap; }
+        .profile-item { flex: 1; min-width: 140px; }
+        .profile-item label { display: block; font-size: 12px; color: #8b6f47; margin-bottom: 4px; }
+        .profile-item select {
+            width: 100%; padding: 9px 12px; border: 1.5px solid #e8d5c0; border-radius: 10px;
+            font-size: 13px; color: #4a3728; background: #fff; appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23c45c26' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 12px center;
+            cursor: pointer; transition: border-color 0.2s;
+        }
+        .profile-item select:focus { outline: none; border-color: #c45c26; }
+        .question-card {
+            background: #fff; border-radius: 20px; padding: 22px 18px;
+            box-shadow: 0 4px 20px rgba(196,92,38,0.1); margin-bottom: 14px;
+        }
+        .question-tag {
+            display: inline-block; background: #fef3e8; color: #c45c26;
+            font-size: 11px; padding: 3px 10px; border-radius: 20px; margin-bottom: 10px; font-weight: 500;
+        }
+        .question-tag.multi { background: #e8f5e9; color: #2e7d32; }
+        .question-text { font-size: 17px; font-weight: 600; color: #3d2b1f; line-height: 1.6; margin-bottom: 16px; }
+        .multi-hint { font-size: 12px; color: #8b6f47; margin-bottom: 12px; background: #fef9f3; padding: 6px 12px; border-radius: 8px; }
+        .options { display: flex; flex-direction: column; gap: 10px; }
+        .option-card {
+            display: flex; align-items: flex-start; gap: 10px; padding: 14px;
+            border: 2px solid #f0e0d0; border-radius: 14px; cursor: pointer;
+            transition: all 0.25s ease; background: #fff;
+        }
+        .option-card:hover { border-color: #e07b39; background: #fff8f2; }
+        .option-card.selected { border-color: #c45c26; background: #fef3e8; }
+        .option-card.disabled { opacity: 0.45; cursor: not-allowed; }
+        .option-indicator {
+            width: 20px; height: 20px; min-width: 20px; border: 2px solid #d4b896;
+            border-radius: 50%; margin-top: 2px; display: flex; align-items: center; justify-content: center;
+            transition: all 0.25s ease;
+        }
+        .option-card.multi-type .option-indicator { border-radius: 4px; }
+        .option-card.selected .option-indicator { border-color: #c45c26; background: #c45c26; }
+        .option-indicator::after { content: ''; width: 8px; height: 8px; background: #fff; border-radius: 50%; opacity: 0; transition: opacity 0.2s; }
+        .option-card.multi-type .option-indicator::after { content: '✓'; width: auto; height: auto; background: none; font-size: 12px; font-weight: 700; color: #fff; border-radius: 0; }
+        .option-card.selected .option-indicator::after { opacity: 1; }
+        .option-content { flex: 1; }
+        .option-label { font-size: 14px; font-weight: 600; color: #5a3e2b; margin-bottom: 2px; }
+        .option-desc { font-size: 13px; color: #8b6f47; line-height: 1.5; }
+        .text-input {
+            width: 100%; min-height: 100px; padding: 14px; border: 2px solid #e8d5c0;
+            border-radius: 12px; font-size: 14px; color: #4a3728; line-height: 1.6;
+            resize: vertical; font-family: inherit; transition: border-color 0.2s;
+        }
+        .text-input:focus { outline: none; border-color: #c45c26; }
+        .text-input::placeholder { color: #c4a882; }
+        .nav-buttons { display: flex; gap: 12px; margin-top: 6px; }
+        .btn {
+            flex: 1; padding: 13px 18px; border: none; border-radius: 12px;
+            font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; text-align: center;
+        }
+        .btn-secondary { background: #f0e0d0; color: #8b6f47; }
+        .btn-secondary:hover { background: #e8d5c0; }
+        .btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-primary {
+            background: linear-gradient(135deg, #e07b39, #c45c26); color: #fff;
+            box-shadow: 0 4px 12px rgba(196,92,38,0.3);
+        }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(196,92,38,0.4); }
+        .result-section {
+            display: none; background: #fff; border-radius: 20px; padding: 28px 22px;
+            box-shadow: 0 4px 24px rgba(196,92,38,0.12); text-align: center;
+        }
+        .result-section.active { display: block; }
+        .result-badge {
+            display: inline-block; background: linear-gradient(135deg, #e07b39, #c45c26);
+            color: #fff; font-size: 13px; padding: 5px 14px; border-radius: 20px; margin-bottom: 14px; font-weight: 500;
+        }
+        .result-image { width: 100%; max-width: 280px; margin: 0 auto 16px; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(196,92,38,0.15); }
+        .result-image img { width: 100%; height: auto; display: block; }
+        .result-role { font-size: 30px; font-weight: 700; color: #c45c26; margin-bottom: 14px; }
+        .result-desc { font-size: 14px; color: #5a3e2b; line-height: 1.7; margin-bottom: 16px; text-align: left; background: #fef9f3; padding: 14px; border-radius: 12px; }
+        .result-suggestion { font-size: 14px; color: #5a3e2b; line-height: 1.7; margin-bottom: 16px; text-align: left; background: #f3f8f0; padding: 14px; border-radius: 12px; border-left: 4px solid #6b9e5c; }
+        .result-suggestion-label { font-weight: 600; color: #4a7c3f; margin-bottom: 4px; display: block; }
+        .result-meta { display: flex; justify-content: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+        .meta-tag { background: #f0e0d0; color: #6b4e3d; font-size: 12px; padding: 5px 12px; border-radius: 20px; }
+        .result-dimension { background: #fef9f3; border-radius: 12px; padding: 14px; margin-bottom: 16px; text-align: left; }
+        .dimension-title { font-size: 13px; font-weight: 600; color: #c45c26; margin-bottom: 10px; }
+        .dimension-bar-group { margin-bottom: 8px; }
+        .dimension-bar-label { display: flex; justify-content: space-between; font-size: 12px; color: #8b6f47; margin-bottom: 4px; }
+        .dimension-bar-bg { width: 100%; height: 6px; background: #f0e0d0; border-radius: 3px; overflow: hidden; }
+        .dimension-bar-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+        .result-actions { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+        .btn-copy { background: #fff; color: #c45c26; border: 2px solid #c45c26; padding: 11px 18px; border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .btn-copy:hover { background: #fef3e8; }
+        .btn-copy.copied { background: #e8f5e9; border-color: #4caf50; color: #2e7d32; }
+        .btn-restart { background: #f0e0d0; color: #8b6f47; border: none; padding: 11px 18px; border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .btn-restart:hover { background: #e8d5c0; }
+        .result-footer { font-size: 13px; color: #8b6f47; line-height: 1.6; padding-top: 14px; border-top: 1px solid #f0e0d0; }
+        .result-footer a { color: #c45c26; text-decoration: none; font-weight: 600; }
+        .result-footer a:hover { text-decoration: underline; }
+        .toast {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.75); color: #fff; padding: 12px 22px;
+            border-radius: 10px; font-size: 14px; z-index: 1000;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        .toast.show { opacity: 1; }
+        .hidden { display: none !important; }
+        @media (max-width: 480px) {
+            body { padding: 10px; }
+            .header h1 { font-size: 22px; }
+            .question-text { font-size: 15px; }
+            .option-desc { font-size: 12px; }
+            .result-role { font-size: 24px; }
+            .btn { font-size: 14px; padding: 11px 14px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>汕头文化现代化倾向测试</h1>
+            <div class="subtitle">本问卷匿名填写，结果仅用于思政课实践分析。感谢参与！</div>
+        </div>
+        <div class="progress-section" id="progressSection">
+            <div class="progress-info">
+                <span id="progressText">第 1 题 / 共 13 题</span>
+                <span id="progressPercent">8%</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progressBar" style="width:8%"></div>
+            </div>
+        </div>
+        <div class="profile-section" id="profileSection">
+            <div class="profile-title">基本信息</div>
+            <div class="profile-row">
+                <div class="profile-item">
+                    <label for="ageSelect">年龄段</label>
+                    <select id="ageSelect">
+                        <option value="">请选择</option>
+                        <option value="18岁以下">18岁以下</option>
+                        <option value="18-25岁">18-25岁</option>
+                        <option value="26-40岁">26-40岁</option>
+                        <option value="41-60岁">41-60岁</option>
+                        <option value="60岁以上">60岁以上</option>
+                    </select>
+                </div>
+                <div class="profile-item">
+                    <label for="regionSelect">身份</label>
+                    <select id="regionSelect">
+                        <option value="">请选择</option>
+                        <option value="汕头本地居民">汕头本地居民</option>
+                        <option value="潮汕其他地区居民">潮汕其他地区居民</option>
+                        <option value="在汕头学习/工作（非本地户籍）">在汕学习/工作</option>
+                        <option value="外地人，曾去过汕头">外地人（曾去过）</option>
+                        <option value="外地人，未去过汕头">外地人（未去过）</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="question-section" id="questionSection">
+            <div class="question-card" id="questionCard"></div>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" id="prevBtn">上一题</button>
+                <button class="btn btn-primary" id="nextBtn">下一题</button>
+            </div>
+        </div>
+        <div class="result-section" id="resultSection">
+            <div class="result-badge">你的文化人格</div>
+            <div class="result-image" id="resultImageContainer"><img id="resultImage" src="" alt="角色形象"></div>
+            <div class="result-role" id="resultRole">--</div>
+            <div class="result-desc" id="resultDesc">--</div>
+            <div class="result-suggestion"><span class="result-suggestion-label">改造建议</span><span id="resultSuggestion">--</span></div>
+            <div class="result-dimension" id="resultDimension"></div>
+            <div class="result-meta"><span class="meta-tag" id="resultAge">--</span><span class="meta-tag" id="resultRegion">--</span></div>
+            <div class="result-actions">
+                <button class="btn-copy" id="copyBtn">📋 复制结果</button>
+                <button class="btn-restart" id="restartBtn">重新测试</button>
+            </div>
+            <div class="result-footer">
+                <p style="margin-bottom:8px">感谢参与！</p>
+                <p style="margin-bottom:8px">1️⃣ 点击 <strong>"📋 复制结果"</strong> 按钮复制所有作答内容</p>
+                <p>2️⃣ 点击 <a href="https://wj.qq.com/s2/26751840/9bd9/" target="_blank">这里打开腾讯问卷</a>，将复制的内容粘贴到文本框中提交</p>
+            </div>
+        </div>
+    </div>
+    <div class="toast" id="toast"></div>
+
+<script>
+(function() {
+    'use strict';
+
+    var questions = [
+        {
+            id: 3, dimension: '传承性', type: 'single',
+            text: '您认为潮汕英歌舞的表演形式应该？',
+            options: [
+                { label: 'A', desc: '严格保留传统步法和脸谱，不能改动' },
+                { label: 'B', desc: '可以加入现代舞蹈、灯光、电音，只要保留核心气势' },
+                { label: 'C', desc: '彻底创新，与流行文化完全融合' }
+            ]
+        },
+        {
+            id: 4, dimension: '传承性', type: 'single',
+            text: '对于汕头小公园骑楼建筑群，您更支持哪种发展方式？',
+            options: [
+                { label: 'A', desc: '完全保持原貌，只允许老字号入驻' },
+                { label: 'B', desc: '外观不变，内部可引入现代品牌和创意商铺' },
+                { label: 'C', desc: '可以改建部分区域以适应现代商业需求' }
+            ]
+        },
+        {
+            id: 5, dimension: '青年吸引力', type: 'multi', maxSelect: 2,
+            text: '您觉得潮汕传统文化对年轻人的吸引力主要体现在？',
+            multiHint: '多选题，最多选择2项',
+            options: [
+                { label: 'A', desc: '美食' },
+                { label: 'B', desc: '非遗表演（英歌舞、潮剧等）' },
+                { label: 'C', desc: '民俗节庆（营老爷、赛大猪等）' },
+                { label: 'D', desc: '工夫茶生活美学' },
+                { label: 'E', desc: '几乎没什么吸引力' }
+            ]
+        },
+        {
+            id: 6, dimension: '青年吸引力', type: 'single',
+            text: '如果要吸引更多年轻人参与汕头文化，您认为最有效的方式是？',
+            options: [
+                { label: 'A', desc: '进校园、开选修课' },
+                { label: 'B', desc: '举办文创市集、非遗体验工作坊' },
+                { label: 'C', desc: '制作短视频、表情包、游戏皮肤' },
+                { label: 'D', desc: '与潮牌、音乐节跨界合作' }
+            ]
+        },
+        {
+            id: 7, dimension: '数字化', type: 'multi', maxSelect: 99,
+            text: '您是否通过以下线上方式接触过汕头文化？',
+            multiHint: '多选题，可选择多项',
+            options: [
+                { label: 'A', desc: '抖音/快手短视频' },
+                { label: 'B', desc: '小红书/微博图文' },
+                { label: 'C', desc: '线上展馆或纪录片' },
+                { label: 'D', desc: '潮汕文化主题的H5小游戏' },
+                { label: 'E', desc: '基本没有接触过' }
+            ]
+        },
+        {
+            id: 8, dimension: '数字化', type: 'multi', maxSelect: 2,
+            text: '您认为汕头文化数字化传播目前存在的主要问题是？',
+            multiHint: '多选题，最多选择2项',
+            options: [
+                { label: 'A', desc: '内容太严肃、不够有趣' },
+                { label: 'B', desc: '缺乏高质量短视频和课程' },
+                { label: 'C', desc: '形式单一，缺少互动体验' },
+                { label: 'D', desc: '没有明显问题' }
+            ]
+        },
+        {
+            id: 9, dimension: '文旅融合', type: 'single',
+            text: '您认为汕头目前文旅融合（如小公园、南澳岛、美食节）做得如何？',
+            options: [
+                { label: 'A', desc: '很好，已经很有特色' },
+                { label: 'B', desc: '一般，还可以提升' },
+                { label: 'C', desc: '较差，商业化过度或缺乏吸引力' }
+            ]
+        },
+        {
+            id: 10, dimension: '文旅融合', type: 'single',
+            text: '您最希望汕头开发以下哪种文创产品？',
+            options: [
+                { label: 'A', desc: '英歌舞/潮剧主题的盲盒、手办' },
+                { label: 'B', desc: '潮汕美食迷你厨房玩具' },
+                { label: 'C', desc: '小公园骑楼积木模型' },
+                { label: 'D', desc: '工夫茶便携套装+数字茶谱' }
+            ]
+        },
+        {
+            id: 11, dimension: '开放包容性', type: 'single',
+            text: '外地朋友来汕头，您会优先推荐体验什么？',
+            options: [
+                { label: 'A', desc: '小公园骑楼+美食街' },
+                { label: 'B', desc: '看一场英歌舞或潮剧表演' },
+                { label: 'C', desc: '喝一顿完整工夫茶' },
+                { label: 'D', desc: '参加一次民俗节庆（如营老爷）' }
+            ]
+        },
+        {
+            id: 12, dimension: '开放包容性', type: 'single',
+            text: '您认为潮汕方言、潮剧等文化内容对外地人的门槛如何？',
+            options: [
+                { label: 'A', desc: '很高，完全听不懂，需要简化' },
+                { label: 'B', desc: '有一定门槛，但加上字幕或解说就能懂' },
+                { label: 'C', desc: '不高，视觉和氛围就能感染人' }
+            ]
+        },
+        {
+            id: 13, dimension: '文明现代性', type: 'single',
+            text: '对于潮汕传统民俗活动中涉及燃放鞭炮、大规模宴请等环节，您认为：',
+            options: [
+                { label: 'A', desc: '应完全按照传统方式进行，这是文化的重要组成部分' },
+                { label: 'B', desc: '可以在保留核心仪式的前提下，适当调整形式' },
+                { label: 'C', desc: '可以探索更现代的替代方式，只要寓意不变即可' }
+            ]
+        },
+        {
+            id: 14, dimension: '文明现代性', type: 'single',
+            text: '对于潮汕传统家庭或社交场合中的一些习惯（如座次安排、家庭分工等），您认为：',
+            options: [
+                { label: 'A', desc: '应当尊重和延续这些传统习惯，它们体现了地方文化特色' },
+                { label: 'B', desc: '可以根据现代生活灵活调整，不强求一律，尊重个人选择' },
+                { label: 'C', desc: '可以重新审视并逐步改变，使之更符合当代社会的平等观念' }
+            ]
+        },
+        {
+            id: 15, dimension: '', type: 'text',
+            text: '请您用一句话提出对汕头文化现代化的建议：'
+        }
+    ];
+
+    var roleLibrary = {
+        'IGEP': {
+            name: '未来策展师',
+            desc: '你像一位站在传统与未来交汇处的策展人，善于用现代语言重新诠释潮汕文化，让古老的传统在新时代绽放光彩。',
+            suggestion: '尝试发起一场"数字英歌舞"实验项目，用AR技术让年轻人通过手机就能体验传统脸谱绘制。',
+            image: '未来策展师.png'
+        },
+        'IGEA': {
+            name: '创意嫁接者',
+            desc: '你是文化的嫁接高手，既能守住传统的根，又敢于打破形式的束缚，用创意让潮汕文化生长出新的枝叶。',
+            suggestion: '组织一场"老手艺+新设计"工作坊，邀请年轻设计师为传统工夫茶具设计现代包装。',
+            image: '创意嫁接者.png'
+        },
+        'TGEP': {
+            name: '骄傲传译官',
+            desc: '你对潮汕文化怀有深深的自豪感，是传统的忠实守护者，同时也愿意用开放的心态向世界讲述潮汕故事。',
+            suggestion: '创建一个"潮汕文化百科"短视频账号，用严谨的考据和生动的讲述，让更多人了解真正的潮汕。',
+            image: '骄傲传译官.png'
+        },
+        'ILRP': {
+            name: '仪式改良者',
+            desc: '你尊重仪式的精神内核，但善于剔除繁文缛节，让传统仪式在现代社会中更加可持续地传承下去。',
+            suggestion: '设计一套"现代祭祖礼仪指南"，在保留核心敬意的前提下，提供简化版流程供不同家庭选择。',
+            image: '仪式改良者.png'
+        },
+        'TLRA': {
+            name: '守祠人',
+            desc: '你是传统文化的坚定守护者，深信老规矩里藏着先人的智慧，愿意默默守护这份文化的纯粹与完整。',
+            suggestion: '考虑成为社区文化志愿者，定期组织传统礼仪体验活动，让更多人理解规矩背后的文化意义。',
+            image: '守祠人.png'
+        },
+        'default': {
+            name: '灵活适应者',
+            desc: '你拥有多元包容的文化视角，能够根据具体情境灵活调整自己的立场，是连接不同文化观念的桥梁。',
+            suggestion: '参与本地文化社团，用你的包容力促进传统派与革新派之间的对话与理解。',
+            image: '灵活适应者.png'
+        }
+    };
+
+    var scoringRules = {
+        q3: { A: 0, B: 1, C: 2 },
+        q4: { A: 0, B: 1, C: 2 },
+        q6: { A: 0, B: 1, C: 2, D: 2 },
+        q11: { A: 1, B: 0, C: 1, D: 0 },
+        q12: { A: 2, B: 1, C: 0 },
+        q13: { A: 0, B: 1, C: 2 },
+        q14: { A: 0, B: 1, C: 2 }
+    };
+
+    var currentQuestion = 0;
+    var answers = [];
+    for (var i = 0; i < questions.length; i++) {
+        if (questions[i].type === 'multi') answers[i] = [];
+        else if (questions[i].type === 'text') answers[i] = '';
+        else answers[i] = null;
+    }
+
+    function $(id) { return document.getElementById(id); }
+
+    function showToast(msg) {
+        var t = $('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(function() { t.classList.remove('show'); }, 2000);
+    }
+
+    function updateProgress() {
+        var total = questions.length;
+        var answered = 0;
+        for (var i = 0; i < answers.length; i++) {
+            var a = answers[i];
+            if (Array.isArray(a)) { if (a.length > 0) answered++; }
+            else if (typeof a === 'string') { if (a.trim().length > 0) answered++; }
+            else if (a !== null) answered++;
+        }
+        var pct = Math.max(Math.round((answered / total) * 100), Math.round(((currentQuestion + 1) / total) * 100));
+        $('progressText').textContent = '第 ' + (currentQuestion + 1) + ' 题 / 共 ' + total + ' 题';
+        $('progressPercent').textContent = pct + '%';
+        $('progressBar').style.width = pct + '%';
+    }
+
+    function isAnswered(idx) {
+        var a = answers[idx];
+        if (Array.isArray(a)) return a.length > 0;
+        if (typeof a === 'string') return a.trim().length > 0;
+        return a !== null;
+    }
+
+    function renderQuestion() {
+        var q = questions[currentQuestion];
+        var card = $('questionCard');
+        var isMulti = q.type === 'multi';
+        var isText = q.type === 'text';
+
+        var tagClass = isMulti ? 'question-tag multi' : 'question-tag';
+        var tagText = (q.dimension ? q.dimension + ' · Q' + q.id : 'Q' + q.id) + (isMulti ? ' · 多选' : isText ? ' · 开放题' : '');
+
+        var html = '<div class="' + tagClass + '">' + tagText + '</div><div class="question-text">' + q.text + '</div>';
+
+        if (isText) {
+            html += '<textarea class="text-input" id="textInput" placeholder="请输入您的建议...">' + (answers[currentQuestion] || '') + '</textarea>';
+        } else {
+            if (isMulti && q.multiHint) {
+                var selCount = (answers[currentQuestion] || []).length;
+                html += '<div class="multi-hint">' + q.multiHint + '（已选 ' + selCount + '/' + (q.maxSelect < 99 ? q.maxSelect : '不限') + '项）</div>';
+            }
+            html += '<div class="options">';
+            for (var idx = 0; idx < q.options.length; idx++) {
+                var opt = q.options[idx];
+                var selected = false, disabled = false;
+                if (isMulti) {
+                    selected = (answers[currentQuestion] || []).indexOf(idx) > -1;
+                    if (!selected && q.maxSelect < 99 && (answers[currentQuestion] || []).length >= q.maxSelect) disabled = true;
+                } else {
+                    selected = answers[currentQuestion] === idx;
+                }
+                var cls = 'option-card' + (isMulti ? ' multi-type' : '') + (selected ? ' selected' : '') + (disabled ? ' disabled' : '');
+                html += '<div class="' + cls + '" data-idx="' + idx + '"><div class="option-indicator"></div><div class="option-content"><div class="option-label">' + opt.label + '</div><div class="option-desc">' + opt.desc + '</div></div></div>';
+            }
+            html += '</div>';
+        }
+
+        card.innerHTML = html;
+
+        // Bind events
+        if (isText) {
+            $('textInput').addEventListener('input', function() {
+                answers[currentQuestion] = this.value;
+            });
+        } else {
+            var opts = card.querySelectorAll('.option-card');
+            for (var j = 0; j < opts.length; j++) {
+                opts[j].addEventListener('click', function() {
+                    if (this.classList.contains('disabled')) return;
+                    var idx = parseInt(this.getAttribute('data-idx'));
+                    if (isMulti) toggleMulti(idx);
+                    else selectSingle(idx);
+                });
+            }
+        }
+
+        $('prevBtn').disabled = currentQuestion === 0;
+        $('nextBtn').textContent = currentQuestion === questions.length - 1 ? '提交并查看结果' : '下一题';
+    }
+
+    function selectSingle(idx) {
+        answers[currentQuestion] = idx;
+        renderQuestion();
+        updateProgress();
+    }
+
+    function toggleMulti(idx) {
+        var q = questions[currentQuestion];
+        var sel = answers[currentQuestion] || [];
+        var pos = sel.indexOf(idx);
+        if (pos > -1) {
+            sel.splice(pos, 1);
+        } else {
+            if (q.maxSelect < 99 && sel.length >= q.maxSelect) {
+                showToast('最多选择' + q.maxSelect + '项');
+                return;
+            }
+            sel.push(idx);
+        }
+        answers[currentQuestion] = sel;
+        renderQuestion();
+        updateProgress();
+    }
+
+    function goPrev() {
+        if (currentQuestion > 0) {
+            currentQuestion--;
+            renderQuestion();
+            updateProgress();
+        }
+    }
+
+    function goNext() {
+        if (!isAnswered(currentQuestion)) {
+            showToast('请先完成当前题目');
+            return;
+        }
+        if (currentQuestion < questions.length - 1) {
+            currentQuestion++;
+            renderQuestion();
+            updateProgress();
+        } else {
+            submitTest();
+        }
+    }
+
+    function getLabel(qIdx, optIdx) {
+        return questions[qIdx].options[optIdx].label;
+    }
+
+    function submitTest() {
+        var age = $('ageSelect').value;
+        var region = $('regionSelect').value;
+        if (!age || !region) {
+            showToast('请完成所有题目并填写基本信息');
+            return;
+        }
+        for (var i = 0; i < questions.length; i++) {
+            if (!isAnswered(i)) {
+                showToast('请完成所有题目并填写基本信息');
+                return;
+            }
+        }
+
+        var traditionScore = scoringRules.q3[getLabel(0, answers[0])] + scoringRules.q4[getLabel(1, answers[1])];
+        var openScore = scoringRules.q11[getLabel(8, answers[8])] + scoringRules.q12[getLabel(9, answers[9])];
+        var ritualScore = scoringRules.q13[getLabel(10, answers[10])] + scoringRules.q6[getLabel(3, answers[3])];
+        var authorityScore = scoringRules.q14[getLabel(11, answers[11])];
+
+        var tTend, oTend, rTend, aTend, hasBalanced = false;
+
+        if (traditionScore <= 1) tTend = 'T';
+        else if (traditionScore >= 3) tTend = 'I';
+        else { tTend = 'B'; hasBalanced = true; }
+
+        if (openScore <= 1) oTend = 'L';
+        else oTend = 'G';
+
+        if (ritualScore <= 1) rTend = 'R';
+        else if (ritualScore >= 3) rTend = 'E';
+        else { rTend = 'B'; hasBalanced = true; }
+
+        if (authorityScore === 0) aTend = 'A';
+        else if (authorityScore === 2) aTend = 'P';
+        else { aTend = 'B'; hasBalanced = true; }
+
+        var roleKey;
+        if (hasBalanced) roleKey = 'default';
+        else {
+            var code = tTend + oTend + rTend + aTend;
+            roleKey = roleLibrary[code] ? code : 'default';
+        }
+
+        var role = roleLibrary[roleKey];
+        $('resultRole').textContent = role.name;
+        $('resultDesc').textContent = role.desc;
+        $('resultSuggestion').textContent = role.suggestion;
+        $('resultAge').textContent = age;
+        $('resultRegion').textContent = region;
+
+        if (role.image) {
+            $('resultImage').src = role.image;
+            $('resultImage').alt = role.name + '角色形象';
+            $('resultImageContainer').style.display = 'block';
+        } else {
+            $('resultImageContainer').style.display = 'none';
+        }
+
+        renderBars(traditionScore, 4, openScore, 3, ritualScore, 4, authorityScore, 2);
+
+        $('questionSection').classList.add('hidden');
+        $('progressSection').classList.add('hidden');
+        $('profileSection').classList.add('hidden');
+        $('resultSection').classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function renderBars(tScore, tMax, oScore, oMax, rScore, rMax, aScore, aMax) {
+        var dims = [
+            { name: '传承 vs 创新', left: '传承 T', right: '创新 I', score: tScore, max: tMax, color: '#c45c26' },
+            { name: '封闭 vs 开放', left: '封闭 L', right: '开放 G', score: oScore, max: oMax, color: '#e07b39' },
+            { name: '仪式 vs 效率', left: '仪式 R', right: '效率 E', score: rScore, max: rMax, color: '#6b9e5c' },
+            { name: '权威 vs 自主', left: '权威 A', right: '自主 P', score: aScore, max: aMax, color: '#5b8db8' }
+        ];
+        var html = '<div class="dimension-title">维度倾向分析</div>';
+        for (var i = 0; i < dims.length; i++) {
+            var d = dims[i];
+            var pct = Math.round((d.score / d.max) * 100);
+            html += '<div class="dimension-bar-group"><div class="dimension-bar-label"><span>' + d.left + '</span><span>' + d.right + '</span></div><div class="dimension-bar-bg"><div class="dimension-bar-fill" style="width:' + pct + '%;background:' + d.color + '"></div></div></div>';
+        }
+        $('resultDimension').innerHTML = html;
+    }
+
+    function copyResult() {
+        var role = $('resultRole').textContent;
+        var desc = $('resultDesc').textContent;
+        var suggestion = $('resultSuggestion').textContent;
+        var age = $('resultAge').textContent;
+        var region = $('resultRegion').textContent;
+
+        // 构建完整的作答结果文本
+        var text = '【汕头文化现代化倾向测试结果】\n';
+        text += '================================\n\n';
+
+        // 角色结果
+        text += '【角色结果】\n';
+        text += '角色名称：' + role + '\n';
+        text += '性格描述：' + desc + '\n';
+        text += '改造建议：' + suggestion + '\n\n';
+
+        // 基本信息
+        text += '【基本信息】\n';
+        text += 'Q1. 年龄段：' + age + '\n';
+        text += 'Q2. 身份：' + region + '\n\n';
+
+        // 所有题目作答详情
+        text += '【答题详情】\n';
+
+        // Q3-Q15
+        for (var i = 0; i < questions.length; i++) {
+            var q = questions[i];
+            var qNum = q.id;
+            var ans = answers[i];
+            var ansText = '';
+
+            if (q.type === 'single') {
+                if (ans !== null && ans !== undefined) {
+                    ansText = q.options[ans].label + '. ' + q.options[ans].desc;
+                } else {
+                    ansText = '未作答';
+                }
+            } else if (q.type === 'multi') {
+                if (Array.isArray(ans) && ans.length > 0) {
+                    var parts = [];
+                    for (var j = 0; j < ans.length; j++) {
+                        parts.push(q.options[ans[j]].label + '. ' + q.options[ans[j]].desc);
+                    }
+                    ansText = parts.join('、');
+                } else {
+                    ansText = '未作答';
+                }
+            } else if (q.type === 'text') {
+                if (typeof ans === 'string' && ans.trim().length > 0) {
+                    ansText = ans.trim();
+                } else {
+                    ansText = '未作答';
+                }
+            }
+
+            text += 'Q' + qNum + '. ' + q.text + '\n';
+            text += '答案：' + ansText + '\n\n';
+        }
+
+        text += '================================\n';
+        text += '请将此内容粘贴到腾讯问卷中。';
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(showCopySuccess).catch(function() { fallbackCopy(text); });
+        } else {
+            fallbackCopy(text);
+        }
+    }
+
+    function fallbackCopy(text) {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); showCopySuccess(); }
+        catch(e) { showToast('复制失败，请手动复制'); }
+        document.body.removeChild(ta);
+    }
+
+    function showCopySuccess() {
+        var btn = $('copyBtn');
+        btn.textContent = '✅ 已复制';
+        btn.classList.add('copied');
+        showToast('结果已复制到剪贴板');
+        setTimeout(function() { btn.textContent = '📋 复制结果'; btn.classList.remove('copied'); }, 2000);
+    }
+
+    function restartTest() {
+        currentQuestion = 0;
+        for (var i = 0; i < questions.length; i++) {
+            if (questions[i].type === 'multi') answers[i] = [];
+            else if (questions[i].type === 'text') answers[i] = '';
+            else answers[i] = null;
+        }
+        $('ageSelect').value = '';
+        $('regionSelect').value = '';
+        $('questionSection').classList.remove('hidden');
+        $('progressSection').classList.remove('hidden');
+        $('profileSection').classList.remove('hidden');
+        $('resultSection').classList.remove('active');
+        renderQuestion();
+        updateProgress();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Bind nav buttons
+    $('prevBtn').addEventListener('click', goPrev);
+    $('nextBtn').addEventListener('click', goNext);
+    $('copyBtn').addEventListener('click', copyResult);
+    $('restartBtn').addEventListener('click', restartTest);
+
+    // Init
+    renderQuestion();
+    updateProgress();
+})();
+</script>
+</body>
+</html>

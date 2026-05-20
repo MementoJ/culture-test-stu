@@ -558,17 +558,21 @@
 
         var tTend, oTend, rTend, aTend, hasBalanced = false;
 
+        // 传承vs创新 (0-4分): 严格阈值，只有恰好2分才算均衡
         if (traditionScore <= 1) tTend = 'T';
         else if (traditionScore >= 3) tTend = 'I';
         else { tTend = 'B'; hasBalanced = true; }
 
+        // 开放度 (0-3分): 不设均衡，强制二分
         if (openScore <= 1) oTend = 'L';
         else oTend = 'G';
 
+        // 仪式vs效率 (0-4分): 严格阈值，只有恰好2分才算均衡
         if (ritualScore <= 1) rTend = 'R';
         else if (ritualScore >= 3) rTend = 'E';
         else { rTend = 'B'; hasBalanced = true; }
 
+        // 权威vs自主 (0-2分): 只有恰好1分才算均衡
         if (authorityScore === 0) aTend = 'A';
         else if (authorityScore === 2) aTend = 'P';
         else { aTend = 'B'; hasBalanced = true; }

@@ -112,8 +112,9 @@
         .dimension-title { font-size: 13px; font-weight: 600; color: #c45c26; margin-bottom: 10px; }
         .dimension-bar-group { margin-bottom: 8px; }
         .dimension-bar-label { display: flex; justify-content: space-between; font-size: 12px; color: #8b6f47; margin-bottom: 4px; }
-        .dimension-bar-bg { width: 100%; height: 6px; background: #f0e0d0; border-radius: 3px; overflow: hidden; }
-        .dimension-bar-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+        .dimension-bar-bg { width: 100%; height: 6px; background: #f0e0d0; border-radius: 3px; overflow: hidden; position: relative; }
+        .dimension-bar-center { position: absolute; left: 50%; top: 0; width: 2px; height: 100%; background: #8b6f47; z-index: 2; }
+        .dimension-bar-fill { height: 100%; border-radius: 3px; transition: all 0.6s ease; position: absolute; top: 0; }
         .result-actions { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
         .btn-copy { background: #fff; color: #c45c26; border: 2px solid #c45c26; padding: 11px 18px; border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
         .btn-copy:hover { background: #fef3e8; }
@@ -610,11 +611,34 @@
             { name: '仪式 vs 效率', left: '仪式 R', right: '效率 E', score: rScore, max: rMax, color: '#6b9e5c' },
             { name: '权威 vs 自主', left: '权威 A', right: '自主 P', score: aScore, max: aMax, color: '#5b8db8' }
         ];
-        var html = '<div class="dimension-title">维度倾向分析</div>';
+        var html = '<div class="dimension-title">维度倾向分析（居中为均衡）</div>';
         for (var i = 0; i < dims.length; i++) {
             var d = dims[i];
-            var pct = Math.round((d.score / d.max) * 100);
-            html += '<div class="dimension-bar-group"><div class="dimension-bar-label"><span>' + d.left + '</span><span>' + d.right + '</span></div><div class="dimension-bar-bg"><div class="dimension-bar-fill" style="width:' + pct + '%;background:' + d.color + '"></div></div></div>';
+            // 计算偏离中心的比例 (-50% 到 +50%)
+            var mid = d.max / 2;
+            var deviation = (d.score - mid) / mid; // -1 到 1
+            var barWidth = Math.abs(deviation) * 50; // 0% 到 50%
+            var isLeft = deviation < 0;
+            var isCenter = Math.abs(deviation) < 0.1;
+            
+            var barStyle = '';
+            if (isCenter) {
+                // 均衡状态：显示小圆点在中心
+                barStyle = 'left:48%;width:4%;background:' + d.color + ';border-radius:3px;';
+            } else if (isLeft) {
+                // 偏左：从中心向左延伸
+                barStyle = 'right:50%;width:' + barWidth + '%;background:' + d.color + ';border-radius:3px 0 0 3px;';
+            } else {
+                // 偏右：从中心向右延伸
+                barStyle = 'left:50%;width:' + barWidth + '%;background:' + d.color + ';border-radius:0 3px 3px 0;';
+            }
+            
+            html += '<div class="dimension-bar-group">' +
+                '<div class="dimension-bar-label"><span>' + d.left + '</span><span>' + d.right + '</span></div>' +
+                '<div class="dimension-bar-bg">' +
+                '<div class="dimension-bar-center"></div>' +
+                '<div class="dimension-bar-fill" style="' + barStyle + '"></div>' +
+                '</div></div>';
         }
         $('resultDimension').innerHTML = html;
     }

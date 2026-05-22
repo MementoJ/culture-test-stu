@@ -410,7 +410,7 @@
         q4: { A: 0, B: 2, C: 4 },
         q5: { A: 0, B: 2, C: 4 },
         q6: { A: 0, B: 1, C: 3, D: 3 },
-        q7: { A: 3, B: 1, C: 0, D: 0 },
+        q7: { A: 3, B: 1, C: 0, D: 0, E: 0 },
         q8: { A: 3, B: 1, C: 1, D: 0 },
         q9: { A: 2, B: 3, C: 1 },
         q10: { A: 3, B: 2, C: 2, D: 0 },
@@ -561,15 +561,25 @@
             renderQuestion();
             updateProgress();
         } else {
+            console.log('准备提交测试...');
             submitTest();
         }
     }
 
     function getLabel(qIdx, optIdx) {
+        if (optIdx === null || optIdx === undefined) {
+            console.error('getLabel: optIdx is null/undefined for qIdx=' + qIdx);
+            return 'A'; // 默认值
+        }
+        if (!questions[qIdx] || !questions[qIdx].options[optIdx]) {
+            console.error('getLabel: invalid index qIdx=' + qIdx + ', optIdx=' + optIdx);
+            return 'A';
+        }
         return questions[qIdx].options[optIdx].label;
     }
 
     function submitTest() {
+        try {
         var age = $('ageSelect').value;
         var region = $('regionSelect').value;
         if (!age || !region) {
@@ -584,28 +594,35 @@
         }
 
         // 计算各维度得分
+        console.log('开始计算得分...');
+        console.log('answers:', answers);
+        
         // 传承 (T/I): Q3+Q4+Q5, 总分0-12
         var traditionScore = scoringRules.q3[getLabel(0, answers[0])] + scoringRules.q4[getLabel(1, answers[1])] + scoringRules.q5[getLabel(2, answers[2])];
+        console.log('传承得分:', traditionScore);
         
         // 开放 (L/G): Q9+Q10+Q11+Q12+Q13, 总分0-14
-        var openScore = scoringRules.q9[getLabel(8, answers[8])] + scoringRules.q10[getLabel(9, answers[9])] + scoringRules.q11[getLabel(10, answers[10])] + scoringRules.q12[getLabel(11, answers[11])] + scoringRules.q13[getLabel(12, answers[12])];
+        var openScore = scoringRules.q9[getLabel(6, answers[6])] + scoringRules.q10[getLabel(7, answers[7])] + scoringRules.q11[getLabel(8, answers[8])] + scoringRules.q12[getLabel(9, answers[9])] + scoringRules.q13[getLabel(10, answers[10])];
+        console.log('开放得分:', openScore);
         
         // 效率 (R/E): Q6+Q7+Q8+Q14, 总分0-15
         var q7Score = 0, q8Score = 0;
-        if (Array.isArray(answers[6])) {
-            for (var i = 0; i < answers[6].length; i++) {
-                q7Score += scoringRules.q7[getLabel(6, answers[6][i])];
+        if (Array.isArray(answers[4])) {
+            for (var j = 0; j < answers[4].length; j++) {
+                q7Score += scoringRules.q7[getLabel(4, answers[4][j])];
             }
         }
-        if (Array.isArray(answers[7])) {
-            for (var i = 0; i < answers[7].length; i++) {
-                q8Score += scoringRules.q8[getLabel(7, answers[7][i])];
+        if (Array.isArray(answers[5])) {
+            for (var k = 0; k < answers[5].length; k++) {
+                q8Score += scoringRules.q8[getLabel(5, answers[5][k])];
             }
         }
-        var ritualScore = scoringRules.q6[getLabel(5, answers[5])] + q7Score + q8Score + scoringRules.q14[getLabel(13, answers[13])];
+        var ritualScore = scoringRules.q6[getLabel(3, answers[3])] + q7Score + q8Score + scoringRules.q14[getLabel(11, answers[11])];
+        console.log('效率得分:', ritualScore, '(Q6:', scoringRules.q6[getLabel(3, answers[3])], ', Q7:', q7Score, ', Q8:', q8Score, ', Q14:', scoringRules.q14[getLabel(11, answers[11])], ')');
         
         // 权威 (A/P): Q15+Q16+Q17, 总分0-12
-        var authorityScore = scoringRules.q15[getLabel(14, answers[14])] + scoringRules.q16[getLabel(15, answers[15])] + scoringRules.q17[getLabel(16, answers[16])];
+        var authorityScore = scoringRules.q15[getLabel(13, answers[13])] + scoringRules.q16[getLabel(14, answers[14])] + scoringRules.q17[getLabel(15, answers[15])];
+        console.log('权威得分:', authorityScore);
 
         var tTend, oTend, rTend, aTend;
         var balancedCount = 0;
@@ -677,6 +694,10 @@
         $('profileSection').classList.add('hidden');
         $('resultSection').classList.add('active');
         window.scrollTo({ top: 0, behavior: 'smooth' });
+        } catch (e) {
+            console.error('提交测试时出错:', e);
+            showToast('系统错误，请刷新页面重试');
+        }
     }
 
     function renderBars(tScore, tMax, oScore, oMax, rScore, rMax, aScore, aMax) {
